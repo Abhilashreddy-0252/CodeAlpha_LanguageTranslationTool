@@ -1,0 +1,29 @@
+# Environment variables & secrets
+.env
+.env.local
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Audio temporary files
+*.mp3
+*.wav
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/

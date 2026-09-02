@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} - Enterprise Portfolio Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 antialiased pb-12">
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-slate-800/90 backdrop-blur-md p-5 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700/70 mb-6 transition-colors duration-300">
+            <div class="flex items-center gap-3.5 mb-4 md:mb-0">
+                <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-language"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+                        {{ app_name }}
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-semibold border border-blue-200 dark:border-blue-500/30">v{{ app_version }}</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ app_subtitle }}</p>
+                </div>
+            </div>
+
+            <!-- Recruiter Actions & Theme Toggle -->
+            <div class="flex items-center flex-wrap gap-3">
+                <button id="architectureBtn" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-500 dark:text-indigo-400"></i> Architecture & Tech Stack
+                </button>
+
+                <span class="text-xs bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-2 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    http://localhost:5000
+                </span>
+
+                <!-- THEME TOGGLE BUTTON -->
+                <button id="themeToggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition flex items-center gap-2 font-semibold text-xs shadow-sm" title="Toggle Light/Dark Theme">
+                    <i class="fa-solid fa-sun text-amber-500 hidden dark:inline text-sm"></i>
+                    <i class="fa-solid fa-moon text-indigo-600 dark:hidden text-sm"></i>
+                    <span id="themeBtnText">Light Mode</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- RECRUITER LIVE ANALYTICS DASHBOARD BAR -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Translations</p>
+                    <h3 id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Avg Latency</p>
+                    <h3 id="statLatency" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0 ms</h3>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chars Processed</p>
+                    <h3 id="statChars" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-font"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Audio Streams</p>
+                    <h3 id="statAudio" class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1-CLICK REVIEWER DEMO PRESETS TOOLBAR -->
+        <div class="bg-white dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 mb-6 shadow-sm transition-colors duration-300">
+            <div class="flex items-center justify-between mb-2.5">
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 uppercase tracking-wider">
+                    <i class="fa-solid fa-vial-circle-check text-blue-500 dark:text-blue-400"></i> Quick Test Presets:
+                </span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400">Click any preset to test instantly</span>
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+                {% for preset in sample_presets %}
+                    <button data-text="{{ preset.text }}" data-target="{{ preset.target }}" class="presetBtn px-3.5 py-2 text-xs font-medium bg-slate-100 dark:bg-slate-700/60 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 rounded-xl text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600/50 transition flex items-center gap-2 shadow-sm">
+                        <span>{{ preset.category }}</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- CONTROL BAR (Language Dropdowns & Swap) -->
+        <div class="bg-white dark:bg-slate-800/90 p-4 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700/70 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
+            <!-- Source Language -->
+            <div class="w-full sm:w-1/2">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Source Language</label>
+                <select id="sourceLang" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    {% for lang in source_languages %}
+                        <option value="{{ lang }}" {% if lang == 'Auto Detect' %}selected{% endif %}>{{ lang }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Swap Button -->
+            <div class="sm:pt-5">
+                <button id="swapBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 flex items-center justify-center border border-slate-200 dark:border-slate-600 shadow-sm transition transform hover:scale-105 active:scale-95" title="Swap Languages">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                </button>
+            </div>
+
+            <!-- Target Language -->
+            <div class="w-full sm:w-1/2">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Target Language</label>
+                <select id="targetLang" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    {% for lang in target_languages %}
+                        <option value="{{ lang }}" {% if lang == 'Telugu' %}selected{% endif %}>{{ lang }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- MAIN TRANSLATION CONTENT -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            
+            <!-- Left Card: Input Text -->
+            <div class="bg-white dark:bg-slate-800/90 p-5 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700/70 flex flex-col transition-colors duration-300">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                        <i class="fa-regular fa-pen-to-square text-blue-500 dark:text-blue-400"></i> Source Text Area (Input)
+                    </span>
+                    <span id="charCounter" class="text-xs text-slate-500 dark:text-slate-400 font-mono">0 / {{ max_char_limit }} chars</span>
+                </div>
+
+                <textarea id="inputText" rows="8" placeholder="Type or paste text here to translate..." class="w-full bg-slate-50 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-xl p-4 text-slate-900 dark:text-slate-100 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none flex-grow font-normal leading-relaxed"></textarea>
+
+                <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/50">
+                    <button id="speakSourceBtn" class="px-3.5 py-2 text-xs font-medium bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-slate-700 dark:text-slate-200 transition flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-volume-high text-blue-500 dark:text-blue-400"></i> Speak Input Audio
+                    </button>
+                    <button id="clearInputBtn" class="px-3.5 py-2 text-xs font-medium bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-slate-700 dark:text-slate-200 transition flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-trash-can text-red-500 dark:text-red-400"></i> Clear Input
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Card: Output Text -->
+            <div class="bg-white dark:bg-slate-800/90 p-5 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700/70 flex flex-col transition-colors duration-300">
+                <div class="flex justify-between items-center mb-3">
+                    <span id="outputHeader" class="font-bold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-sparkles text-amber-500 dark:text-amber-400"></i> Translation Output
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span id="latencyBadge" class="hidden text-[11px] px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-mono border border-emerald-300 dark:border-emerald-800">0 ms</span>
+                        <span id="engineBadge" class="text-xs px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Idle</span>
+                    </div>
+                </div>
+
+                <div id="outputText" class="w-full bg-slate-50 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-xl p-4 text-slate-900 dark:text-slate-100 text-base min-h-[200px] flex-grow overflow-y-auto whitespace-pre-wrap select-text leading-relaxed"></div>
+
+                <div class="flex flex-wrap justify-between items-center gap-2 mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/50">
+                    <div class="flex items-center gap-2">
+                        <button id="speakTargetBtn" class="px-3.5 py-2 text-xs font-medium bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-slate-700 dark:text-slate-200 transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-volume-high text-emerald-500 dark:text-emerald-400"></i> Speak Translation
+                        </button>
+                        <button id="copyBtn" class="px-3.5 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                        <!-- EXPORT REPORT BUTTON -->
+                        <button id="exportReportBtn" class="px-3.5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 shadow-sm" title="Export Input & Translated Text Report">
+                            <i class="fa-solid fa-download"></i> Export Report (.txt)
+                        </button>
+                    </div>
+                    <button id="clearAllBtn" class="px-3.5 py-2 text-xs font-medium bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-slate-700 dark:text-slate-200 transition flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-rotate-left text-slate-400"></i> Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRANSLATE ACTION BUTTON -->
+        <div class="mb-6">
+            <button id="translateBtn" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-blue-600/20 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3">
+                <i class="fa-solid fa-rocket"></i> Translate Text
+            </button>
+        </div>
+
+        <!-- RECENT TRANSLATION HISTORY LOG -->
+        <div class="bg-white dark:bg-slate-800/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 mb-6 shadow-sm transition-colors duration-300">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-history text-indigo-500 dark:text-indigo-400"></i> Translation History Log
+                </span>
+                <button id="clearHistoryBtn" class="text-xs text-slate-500 dark:text-slate-400 hover:text-red-500 transition">Clear Log</button>
+            </div>
+            <div id="historyContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                <p class="text-xs text-slate-500 italic">No translations recorded yet in this session.</p>
+            </div>
+        </div>
+
+        <!-- STATUS & NOTICE BAR -->
+        <div class="bg-white dark:bg-slate-800 px-5 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center text-slate-600 dark:text-slate-400 shadow-sm transition-colors duration-300">
+            <span id="statusText" class="flex items-center gap-2 font-medium">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span> Ready
+            </span>
+            <span class="font-mono text-[11px]">HTTP Server: 127.0.0.1:5000</span>
+        </div>
+
+    </div>
+
+    <!-- TECH ARCHITECTURE MODAL FOR RECRUITERS -->
+    <div id="architectureModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative text-slate-900 dark:text-slate-100">
+            <button id="closeModalBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-900 dark:hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-500 dark:text-blue-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">System Architecture & Technical Design</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">AI Language Translation Tool Technical Overview</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-700 dark:text-slate-300 leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+                <div class="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-blue-600 dark:text-blue-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-network-wired"></i> Dual Presentation Layer (Desktop GUI & Web API)</h4>
+                    <p>Designed with a modular architecture decoupling backend translation services from UI components. Operates both as a native Python Tkinter desktop GUI application and as a Flask REST server serving an interactive web interface.</p>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-emerald-600 dark:text-emerald-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> API Resilience & Circuit-Breaker Fallback</h4>
+                    <p>Integrates Google Cloud Translation API v2 with automatic fallback translation engine handling. In case of API quota limits or unconfigured keys, the app seamlessly handles requests without crashing.</p>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-purple-600 dark:text-purple-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-wave-square"></i> Asynchronous Speech Streaming</h4>
+                    <p>Uses gTTS (Google Text-to-Speech) for text-to-speech audio synthesis across 21 global and regional Indian languages, streamed asynchronously in background threads to avoid main looper blocking.</p>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-amber-600 dark:text-amber-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-code"></i> Project File Structure</h4>
+                    <pre class="font-mono text-[11px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-950 p-2.5 rounded-lg mt-1 overflow-x-auto">main.py (Tkinter GUI) | app_web.py (Flask Web API) | translator.py (API Engine)
+speech.py (gTTS Audio) | languages.py (ISO Mappings) | config.py (Environment)</pre>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+                <button id="closeModalBtn2" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition">Close Overview</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Audio Player for Speech -->
+    <audio id="audioPlayer" class="hidden"></audio>
+
+    <script>
+        const maxLimit = {{ max_char_limit }};
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const charCounter = document.getElementById('charCounter');
+        const sourceLang = document.getElementById('sourceLang');
+        const targetLang = document.getElementById('targetLang');
+        const translateBtn = document.getElementById('translateBtn');
+        const statusText = document.getElementById('statusText');
+        const engineBadge = document.getElementById('engineBadge');
+        const latencyBadge = document.getElementById('latencyBadge');
+        const outputHeader = document.getElementById('outputHeader');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const historyContainer = document.getElementById('historyContainer');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeBtnText = document.getElementById('themeBtnText');
+
+        let lastDetectedSource = null;
+        let lastLatencyMs = 0;
+        let translationHistory = [];
+
+        // Architecture Modal Toggle
+        const archModal = document.getElementById('architectureModal');
+        document.getElementById('architectureBtn').addEventListener('click', () => archModal.classList.remove('hidden'));
+        document.getElementById('closeModalBtn').addEventListener('click', () => archModal.classList.add('hidden'));
+        document.getElementById('closeModalBtn2').addEventListener('click', () => archModal.classList.add('hidden'));
+
+        // DYNAMIC LIGHT / DARK THEME TOGGLE FUNCTION
+        function updateThemeUI() {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                themeBtnText.textContent = "Dark Mode";
+            } else {
+                themeBtnText.textContent = "Light Mode";
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDarkNow = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme_preference', isDarkNow ? 'dark' : 'light');
+            updateThemeUI();
+            setStatus(`Switched to ${isDarkNow ? 'Dark' : 'Light'} Mode.`, 'info');
+        });
+
+        // Initialize Theme from localStorage
+        const savedTheme = localStorage.getItem('theme_preference');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+        updateThemeUI();
+
+        // Reviewer Presets Click Handlers
+        document.querySelectorAll('.presetBtn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const text = btn.getAttribute('data-text');
+                const target = btn.getAttribute('data-target');
+                inputText.value = text;
+                targetLang.value = target;
+                inputText.dispatchEvent(new Event('input'));
+                translateBtn.click();
+            });
+        });
+
+        // Live Character Counter
+        inputText.addEventListener('input', () => {
+            const count = inputText.value.length;
+            charCounter.textContent = `${count} / ${maxLimit} chars`;
+            if (count > maxLimit) {
+                charCounter.classList.add('text-red-500');
+            } else {
+                charCounter.classList.remove('text-red-500');
+            }
+        });
+
+        // Swap Languages & Text
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            const srcVal = sourceLang.value;
+            const tgtVal = targetLang.value;
+
+            if (srcVal === 'Auto Detect') {
+                sourceLang.value = tgtVal;
+                targetLang.value = 'English';
+            } else {
+                sourceLang.value = tgtVal;
+                targetLang.value = srcVal;
+            }
+
+            const inVal = inputText.value;
+            const outVal = outputText.textContent;
+
+            if (outVal.trim()) {
+                inputText.value = outVal;
+                outputText.textContent = inVal;
+                inputText.dispatchEvent(new Event('input'));
+            }
+            setStatus('Swapped languages.', 'info');
+        });
+
+        // Translate Request
+        translateBtn.addEventListener('click', async () => {
+            const text = inputText.value.trim();
+            if (!text) {
+                setStatus('⚠️ Please enter text to translate.', 'warning');
+                alert('Please enter text to translate.');
+                return;
+            }
+
+            if (text.length > maxLimit) {
+                setStatus(`⚠️ Text exceeds ${maxLimit} character limit.`, 'warning');
+                return;
+            }
+
+            translateBtn.disabled = true;
+            translateBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Translating...`;
+            setStatus('Translating...', 'info');
+
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        source_lang: sourceLang.value,
+                        target_lang: targetLang.value
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    outputText.textContent = data.translated_text;
+                    lastDetectedSource = data.detected_source_code || data.detected_source_name;
+                    lastLatencyMs = data.latency_ms || 0;
+
+                    engineBadge.textContent = data.engine_used || 'Engine';
+                    latencyBadge.textContent = `${lastLatencyMs} ms`;
+                    latencyBadge.classList.remove('hidden');
+
+                    if (sourceLang.value === 'Auto Detect' && data.detected_source_name) {
+                        outputHeader.innerHTML = `<i class="fa-solid fa-sparkles text-amber-500 dark:text-amber-400"></i> Translation Output (Detected: ${data.detected_source_name})`;
+                    } else {
+                        outputHeader.innerHTML = `<i class="fa-solid fa-sparkles text-amber-500 dark:text-amber-400"></i> Translation Output`;
+                    }
+
+                    // Update History Log
+                    addToHistory(text, data.translated_text, sourceLang.value, targetLang.value);
+
+                    // Update Live Stats
+                    if (data.stats) updateStats(data.stats);
+
+                    if (data.notice) {
+                        setStatus(`✅ Translation complete! ${data.notice}`, 'warning');
+                    } else {
+                        setStatus(`✅ Translated in ${lastLatencyMs} ms using ${data.engine_used}.`, 'success');
+                    }
+                } else {
+                    setStatus(`❌ Error: ${data.error}`, 'error');
+                    alert(`Translation Error: ${data.error}`);
+                }
+            } catch (err) {
+                setStatus(`❌ Network Error: ${err.message}`, 'error');
+            } finally {
+                translateBtn.disabled = false;
+                translateBtn.innerHTML = `<i class="fa-solid fa-rocket"></i> Translate Text`;
+            }
+        });
+
+        // Update Reviewer Analytics Display
+        function updateStats(stats) {
+            document.getElementById('statTotal').textContent = stats.total_translations || 0;
+            document.getElementById('statLatency').textContent = `${stats.avg_latency_ms || 0} ms`;
+            document.getElementById('statChars').textContent = stats.total_characters || 0;
+            document.getElementById('statAudio').textContent = stats.total_speech_requests || 0;
+        }
+
+        // Add item to Translation History Log
+        function addToHistory(source, translated, srcLang, tgtLang) {
+            translationHistory.unshift({ source, translated, srcLang, tgtLang, time: new Date().toLocaleTimeString() });
+            if (translationHistory.length > 10) translationHistory.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (translationHistory.length === 0) {
+                historyContainer.innerHTML = `<p class="text-xs text-slate-500 italic">No translations recorded yet in this session.</p>`;
+                return;
+            }
+
+            historyContainer.innerHTML = translationHistory.map((item, idx) => `
+                <div class="p-2.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700/50 flex justify-between items-center text-xs hover:border-slate-400 dark:hover:border-slate-600 transition">
+                    <div class="truncate max-w-[80%]">
+                        <span class="text-blue-600 dark:text-blue-400 font-semibold">[${item.srcLang} → ${item.tgtLang}]</span>
+                        <span class="text-slate-800 dark:text-slate-300 ml-2 font-medium">${item.source.substring(0, 45)}...</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-slate-500 font-mono">${item.time}</span>
+                        <button onclick="restoreHistory(${idx})" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Restore</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.restoreHistory = function(idx) {
+            const item = translationHistory[idx];
+            if (item) {
+                inputText.value = item.source;
+                outputText.textContent = item.translated;
+                sourceLang.value = item.srcLang;
+                targetLang.value = item.tgtLang;
+                inputText.dispatchEvent(new Event('input'));
+                setStatus('Restored from history log.', 'info');
+            }
+        };
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            translationHistory = [];
+            renderHistory();
+        });
+
+        // Speak Text Function for all languages
+        function playSpeech(text, lang, isSource = false) {
+            if (!text.trim()) {
+                setStatus('⚠️ No text available to speak.', 'warning');
+                return;
+            }
+
+            setStatus(`🔊 Generating audio for ${lang}...`, 'info');
+
+            let url = `/api/tts?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lang)}`;
+            if (isSource && lastDetectedSource) {
+                url += `&detected_lang=${encodeURIComponent(lastDetectedSource)}`;
+            }
+
+            audioPlayer.src = url;
+            audioPlayer.play().then(() => {
+                setStatus(`🔊 Playing ${isSource ? 'source' : 'translation'} audio in ${lang}...`, 'success');
+            }).catch(err => {
+                setStatus(`❌ Audio playback failed: ${err.message}`, 'error');
+            });
+        }
+
+        audioPlayer.addEventListener('ended', () => {
+            setStatus('✅ Audio playback finished.', 'success');
+        });
+
+        document.getElementById('speakSourceBtn').addEventListener('click', () => {
+            playSpeech(inputText.value, sourceLang.value, true);
+        });
+
+        document.getElementById('speakTargetBtn').addEventListener('click', () => {
+            playSpeech(outputText.textContent, targetLang.value, false);
+        });
+
+        // EXPORT REPORT FUNCTION (Native Form Submission for Instant Browser Download)
+        document.getElementById('exportReportBtn').addEventListener('click', () => {
+            const srcText = inputText.value.trim();
+            const tgtText = (outputText.textContent || outputText.innerText || "").trim();
+            
+            if (!srcText && !tgtText) {
+                setStatus('⚠️ Nothing to export. Please enter text or translate first.', 'warning');
+                alert('Please enter text in the input box or perform a translation before exporting.');
+                return;
+            }
+
+            // Create hidden form and submit synchronously to trigger native browser file download
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/export_file';
+
+            const fields = {
+                source_text: srcText,
+                translated_text: tgtText,
+                source_lang: sourceLang.value,
+                target_lang: targetLang.value,
+                engine_used: engineBadge.textContent || 'Google Cloud / Fallback',
+                latency_ms: latencyBadge.textContent || 'N/A'
+            };
+
+            for (const [key, val] of Object.entries(fields)) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = key;
+                hiddenInput.value = val;
+                form.appendChild(hiddenInput);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            setStatus('📥 Exported Input & Translated Text Report (.txt) successfully!', 'success');
+        });
+
+        // Copy Translation
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const text = outputText.textContent.trim();
+            if (!text) {
+                setStatus('⚠️ Nothing to copy. Output is empty.', 'warning');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                setStatus('📋 Copied translation to clipboard!', 'success');
+            }).catch(() => {
+                setStatus('Failed to copy to clipboard.', 'error');
+            });
+        });
+
+        // Clear buttons
+        document.getElementById('clearInputBtn').addEventListener('click', () => {
+            inputText.value = '';
+            inputText.dispatchEvent(new Event('input'));
+            setStatus('Cleared input text.', 'info');
+        });
+
+        document.getElementById('clearAllBtn').addEventListener('click', () => {
+            inputText.value = '';
+            outputText.textContent = '';
+            inputText.dispatchEvent(new Event('input'));
+            outputHeader.innerHTML = `<i class="fa-solid fa-sparkles text-amber-500 dark:text-amber-400"></i> Translation Output`;
+            engineBadge.textContent = 'Idle';
+            latencyBadge.classList.add('hidden');
+            setStatus('Ready', 'info');
+        });
+
+        function setStatus(msg, type) {
+            const colorMap = {
+                'info': 'text-blue-600 dark:text-blue-400',
+                'success': 'text-emerald-600 dark:text-emerald-400',
+                'warning': 'text-amber-600 dark:text-amber-400',
+                'error': 'text-red-600 dark:text-red-400'
+            };
+            statusText.className = `flex items-center gap-2 font-medium ${colorMap[type] || 'text-slate-600 dark:text-slate-400'}`;
+            statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-current"></span> ${msg}`;
+        }
+    </script>
+</body>
+</html>
