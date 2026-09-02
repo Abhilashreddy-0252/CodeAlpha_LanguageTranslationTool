@@ -232,9 +232,9 @@ def api_stats():
 
 
 def main():
-    print(f"\n[+] Starting {APP_NAME} Web Server...")
-    print(f"[+] Localhost Web Link: http://localhost:5000 (or http://127.0.0.1:5000)\n")
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"\n[+] Starting {APP_NAME} Web Server on port {port}...")
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 
 if __name__ == "__main__":
